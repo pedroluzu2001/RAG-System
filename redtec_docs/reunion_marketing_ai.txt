@@ -1,0 +1,7 @@
+Fecha: 15 de febrero de 2025
+Tema: Estrategia de marketing basada en IA
+
+- Análisis de campañas automatizadas con IA generativa para contenido publicitario.
+- Se observó un aumento del 18% en engagement usando prompts optimizados.
+- Decisión: escalar el experimento a las redes de clientes premium.
+- Acción: documentar pipeline y métricas en Confluence.

@@ -1,0 +1,7 @@
+Fecha: 3 de enero de 2025
+Tema: Lanzamiento del Proyecto Aurora
+
+- Se presentó la visión general del proyecto Aurora, orientado a desarrollar un modelo de IA especializado en análisis de voz emocional.
+- El equipo de data definió el pipeline de recolección de audios etiquetados.
+- Se acordó usar Hugging Face para gestionar los modelos base y Weights & Biases para el tracking de experimentos.
+- Tarea: crear entorno de desarrollo compartido y definir primeras métricas de evaluación.

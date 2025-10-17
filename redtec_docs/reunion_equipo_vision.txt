@@ -1,0 +1,7 @@
+Fecha: 5 de febrero de 2025
+Tema: Proyecto de visión por computadora – detección de defectos
+
+- El equipo de visión propuso usar YOLOv8 para la detección de defectos en líneas de producción.
+- Se definió un set inicial de 5.000 imágenes para entrenamiento.
+- Decisión: implementar validación cruzada con métricas de precisión y recall.
+- Pendiente: probar rendimiento en dispositivos Edge.

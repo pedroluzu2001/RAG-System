@@ -1,0 +1,7 @@
+Fecha: 25 de marzo de 2025
+Tema: Auditoría de seguridad y privacidad de modelos
+
+- Se revisaron las políticas de anonimización de datos sensibles.
+- Pendiente: implementar monitoreo de prompts para evitar fugas de información.
+- Acción: crear checklist de cumplimiento ISO/IEC 27001.
+- Se programó próxima revisión en 30 días.

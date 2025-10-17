@@ -1,0 +1,7 @@
+Fecha: 2 de marzo de 2025
+Tema: Infraestructura de cómputo en la nube
+
+- Se discutió la migración parcial de entrenamiento de modelos a AWS.
+- Comparativa de costos entre AWS Sagemaker y Azure ML.
+- Decisión: mantener la base de datos de embeddings en servidores internos por seguridad.
+- Acción: configurar VPN para acceso seguro al clúster híbrido.

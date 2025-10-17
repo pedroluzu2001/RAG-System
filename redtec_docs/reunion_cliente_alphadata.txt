@@ -1,0 +1,7 @@
+Fecha: 12 de marzo de 2025
+Tema: Reunión con cliente AlphaData
+
+- El cliente solicitó personalización de los modelos de predicción de demanda.
+- Se propuso fine-tuning sobre sus datos históricos de ventas.
+- Riesgo: falta de limpieza y formato inconsistente de datos.
+- Acción: definir plan de preprocesamiento y entregar prototipo en dos semanas.

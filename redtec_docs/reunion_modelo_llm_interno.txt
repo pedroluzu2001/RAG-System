@@ -1,0 +1,7 @@
+Fecha: 10 de enero de 2025
+Tema: Modelo de lenguaje interno RedTec LLM-Alpha
+
+- Se revisó el rendimiento del prototipo LLM-Alpha (7B parámetros).
+- El modelo muestra buen desempeño en tareas de soporte técnico y resúmenes de correos.
+- Problema detectado: el tokenizador no maneja bien caracteres acentuados en español.
+- Acción: crear dataset de ajuste fino con textos de soporte y documentación interna.

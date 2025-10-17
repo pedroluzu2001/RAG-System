@@ -1,0 +1,7 @@
+Fecha: 10 de abril de 2025
+Tema: Flujo automatizado con n8n y MCP
+
+- El equipo integró el flujo de ingestion de documentos vía n8n.
+- MCP expone la herramienta `list_documents` para interactuar con la base de conocimiento.
+- Decisión: agregar nodo LLM con contexto de búsqueda y guardar logs en MongoDB.
+- Tarea: documentar flujo en README técnico.

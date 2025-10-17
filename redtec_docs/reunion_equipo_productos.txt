@@ -1,0 +1,7 @@
+Fecha: 22 de enero de 2025
+Tema: Integración de IA en productos RedTec
+
+- Decisión de integrar el sistema de recomendación inteligente en RedTec CRM.
+- Se evaluó la arquitectura de microservicios actual y la necesidad de una API unificada.
+- Los clientes solicitaron explicaciones más transparentes de las predicciones del modelo.
+- Tarea: diseño de módulo de “explicabilidad” para el dashboard.

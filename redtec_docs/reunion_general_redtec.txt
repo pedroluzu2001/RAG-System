@@ -1,0 +1,7 @@
+Fecha: 20 de abril de 2025
+Tema: Revisión trimestral general
+
+- Se reportó un crecimiento del 25% en contratos de IA aplicada.
+- El equipo de investigación presentó avances en modelos multimodales.
+- Se discutió la necesidad de contratar dos perfiles de MLOps adicionales.
+- Próxima reunión general: 20 de julio de 2025.
