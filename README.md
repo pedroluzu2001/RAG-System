@@ -106,3 +106,12 @@ Proyecto desarrollado por Pedro Luzuriaga
 
 Correo: pedriniandre@gmal.com
 ```
+
+
+EJEMPLO
+
+<img width="1804" height="785" alt="image" src="https://github.com/user-attachments/assets/5b8f271e-0954-4947-90f9-21de7a15187c" />
+
+
+ESTE INTERFAZ SE LOGRA INGRESANDO AL LINK DE TU PUERTO:
+http://127.0.0.1:8000/docs#/default/ask_ask_post
