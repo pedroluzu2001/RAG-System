@@ -1,4 +1,4 @@
-# **RedTec RAG Project**
+# **RAG Project**
 
 ## **Descripción**
 Proyecto de **RAG (Retrieval-Augmented Generation)** usando **FastAPI**, **FAISS** y **GPT-4o-mini** vía OpenRouter.  
@@ -115,3 +115,68 @@ EJEMPLO
 
 ESTE INTERFAZ SE LOGRA INGRESANDO AL LINK DE TU PUERTO:
 http://127.0.0.1:8000/docs#/default/ask_ask_post
+
+
+# **INDICACION BOT CON RAG N8N**
+Instrucciones de uso del Bot en Telegram (@RAG_LUZURIAGA_BOT):
+Para usar el bot es necesario entrar en Telegram y buscar el bot:  @RAG_LUZURIAGA_BOT
+
+<img width="1539" height="460" alt="image" src="https://github.com/user-attachments/assets/bfd554c8-fea4-4afe-9c25-53c0097013a9" />
+
+
+## **1. Propósito**
+El bot permite al usuario hacer preguntas sobre reuniones empresariales usando un sistema RAG (Recuperación + LLM), y gestionar reuniones directamente mediante herramientas MCP (como Google Calendar) solo cuando el usuario proporciona datos completos.
+
+## **2. Cómo funciona el flujo**
+Usuario interactúa con el bot
+Buscar y abrir el bot: @RAG_LUZURIAGA_BOT
+Escribir un mensaje relacionado con reuniones o información empresarial.
+Procesamiento por el LLM
+
+## **El mensaje se envía al LLM, que analiza:**
+Si la pregunta requiere información de reuniones: devuelve respuesta contextual basada en los documentos de reuniones.
+Si la pregunta no tiene relación con reuniones, responde de manera conversacional normal.
+Clasificación de intención para reuniones
+Si el LLM detecta intención de crear o eliminar reuniones:
+Devuelve los datos necesarios: título, fecha/hora inicio, fecha/hora fin, correos de participantes.
+Si falta algún dato, el bot pedirá únicamente la información faltante.
+Si no hay intención de crear/eliminar reunión, la respuesta del LLM se mantiene tal cual, sin modificaciones.
+
+## **Agente de AI (gestión de reuniones)**
+Recibe la respuesta del LLM.
+Si los datos están completos:
+Crea la reunión en Google Calendar o elimina la reunión existente.
+Devuelve un mensaje de confirmación:
+Crear: "La reunión 'Título de la reunión' fue creada exitosamente para los participantes correo1@example.com
+, correo2@example.com
+."
+Eliminar: "La reunión 'Título de la reunión' fue eliminada exitosamente."
+
+Si los datos están incompletos:
+No realiza ninguna acción.
+Devuelve un mensaje solicitando únicamente los datos faltantes.
+Si no hay intención de crear/eliminar reunión:
+La respuesta del LLM se mantiene sin cambios.
+
+## **3. Reglas generales**
+No inventar información de reuniones.
+No modificar la respuesta del LLM si no hay intención explícita de crear/eliminar reunión.
+Solo ejecutar la herramienta MCP cuando todos los datos estén presentes.
+Mantener conversación natural y respuestas contextuales para preguntas no relacionadas con reuniones.
+
+ ## **4. Ejemplo de uso**
+Usuario: "Quiero agendar una reunión de seguimiento con el equipo de ventas el próximo lunes a las 10am."
+LLM: detecta intención de crear reunión, devuelve datos faltantes si no se proporcionaron todos (correo, fin, título).
+Usuario: proporciona los datos faltantes.
+Agente de AI: agenda reunión y confirma: "La reunión 'Seguimiento Ventas' fue creada exitosamente para los participantes correo1@example.com
+, correo2@example.com
+."
+
+Usuario: "¿Qué se decidió en la reunión pasada?"
+LLM: devuelve respuesta contextual basada en documentos.
+Agente de AI: no realiza ninguna acción, mantiene la respuesta tal cual.
+
+## **EJEMPLO DE CONVERSACION:**
+![Imagen de WhatsApp 2025-10-18 a las 10 57 26_73d80bd1](https://github.com/user-attachments/assets/9ef09d43-360c-4af6-bd4e-b71169ba542a)
+
+
