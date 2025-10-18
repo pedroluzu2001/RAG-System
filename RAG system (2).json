@@ -1,0 +1,899 @@
+{
+  "name": "RAG system",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rag",
+          "mode": "list",
+          "cachedResultName": "rag"
+        },
+        "embeddingBatchSize": 300,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        -32
+      ],
+      "id": "e423e614-2a0c-43ad-9eef-0ce57ef09358",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "aViH9mGVniJDpZ0V",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "6bfebd02-db07-45b1-98e1-6911f0275e15",
+      "name": "Embeddings Cohere",
+      "credentials": {
+        "cohereApi": {
+          "id": "sy7my4CjX8NTHOpS",
+          "name": "CohereApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        208
+      ],
+      "id": "7055b5db-50fc-46ea-b8c9-03070b663cf2",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        416
+      ],
+      "id": "e1b62556-da47-4dce-8e87-f901a8de4058",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1iU6ax1VjTqGe0P6V72O9K2suXzpK1jRz",
+          "mode": "list",
+          "cachedResultName": "Archivos_RAG",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1iU6ax1VjTqGe0P6V72O9K2suXzpK1jRz"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "4c19206b-a555-4552-9a56-65309907ccbe",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mCO2cmFHTSbJ2LxS",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -192,
+        -32
+      ],
+      "id": "a54205bc-4e9d-4ea1-90ac-01f65f5df3a4",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mCO2cmFHTSbJ2LxS",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "910cc9b3-f42a-4f51-8b75-ef70b3668907",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "callback_query",
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "d17aa4c9-1637-4dc0-a5ca-0309b9292de6",
+      "name": "Telegram Trigger",
+      "webhookId": "e73d02a8-d5fc-4cbb-ac43-571d62419310",
+      "credentials": {
+        "telegramApi": {
+          "id": "QyiU7SEZGkpyDoHZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}\n",
+        "options": {
+          "systemPromptTemplate": "Eres un asistente especializado en análisis de reuniones empresariales.\n- Para preguntas o mensajes relacionados con reuniones, actúa basándote exclusivamente en el contexto proporcionado.\n- Para saludos, preguntas casuales o conversaciones fuera del contexto, responde de forma amable y natural.\n\n----------------\nContexto:\n{context}\n\nPregunta (texto original recibido):\n{{ $json.message.text }}\n----------------\n\nINSTRUCCIONES OBLIGATORIAS:\n\n1. Si el mensaje NO tiene intención de crear o eliminar una reunión, responde normalmente según las reglas iniciales.\n\n2. Si el mensaje SÍ tiene intención de crear o eliminar una reunión, revisa si el usuario YA PROPORCIONÓ las siguientes cuatro piezas:\n   - Fecha\n   - Hora de inicio\n   - Duración o hora de finalización\n   - Correo electrónico\n\n3. Si las cuatro piezas están presentes en el texto recibido:\n   → Devuelve exactamente el mismo texto original recibido, sin reformular, sin resumir, ni agregar nada.\n   → El formato de salida debe ser un JSON con esta estructura literal (no reemplaces nada):\n     [\n       {{\n         \"response\": \"TEXTO ORIGINAL EXACTO (incluyendo saltos de línea y capitalización)\"\n       }}\n     ]\n\n4. Si falta alguno de los datos, pregunta únicamente por los que falten.\n\nEjemplo:\n- Input: 10 de diciembre\\n10 am\\n2 horas\\npedriniandres@gmail.com\n- Output: [\n    {{\n      \"response\": \"10 de diciembre\\n10 am\\n2 horas\\npedriniandres@gmail.com\"\n    }}\n  ]\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.6,
+      "position": [
+        928,
+        -32
+      ],
+      "id": "ee731a86-d0bb-423d-89bd-c9f25f38920e",
+      "name": "Question and Answer Chain"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        112
+      ],
+      "id": "847c2a43-242b-44f9-b1e8-463949f66d97",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rag",
+          "mode": "list",
+          "cachedResultName": "rag"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        224
+      ],
+      "id": "ce6ff5fb-558a-45f4-adeb-aef2fd61480d",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "aViH9mGVniJDpZ0V",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        336
+      ],
+      "id": "89dac3df-1918-4e00-bf91-a0f9c76f8368",
+      "name": "Embeddings Cohere1",
+      "credentials": {
+        "cohereApi": {
+          "id": "sy7my4CjX8NTHOpS",
+          "name": "CohereApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        -64
+      ],
+      "id": "62fa23ae-fc1e-4cfa-99c3-91c86b309495",
+      "name": "Send a text message",
+      "webhookId": "f7fff79e-3f8d-43e8-b33e-ecab90794f1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "QyiU7SEZGkpyDoHZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3346a93-1369-4bcc-adb0-6266e767b251",
+              "name": "id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        -176
+      ],
+      "id": "c783913f-fdec-438a-ab68-ea20cb5d5915",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1760,
+        -64
+      ],
+      "id": "203ac61c-7638-44b8-8733-bd634b027964",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "110e33f7-b9c3-4022-936e-5b9f7b9b83a8",
+              "name": "id",
+              "value": "={{$json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "4ab7b688-3642-4054-bb85-5cdc573bdfa5",
+              "name": "text",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1904,
+        -64
+      ],
+      "id": "ae76d117-17fc-4c11-8c2b-6997458f2032",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        928,
+        112
+      ],
+      "id": "5ac7c0f5-9619-4dfd-919d-e84f0b15a161",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Dk07O50OnUtUN5R9",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RAG FUNCIONAL LOCAL EN TELEGRAM",
+        "height": 832,
+        "width": 2336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "e6e440bb-7735-4b1a-9c34-e649f6d33bde",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "path": "78fd89e2-4f3c-4d97-a817-f655dc719552"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        -176
+      ],
+      "id": "00e1d279-a3e2-481c-b5bf-4a0db8a16ddd",
+      "name": "MCP Server Trigger",
+      "webhookId": "78fd89e2-4f3c-4d97-a817-f655dc719552"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2560,
+        32
+      ],
+      "id": "06975458-4b56-420e-9e7f-7c39b783ea68",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "lQgt6Q3HgXy5KkL9",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2832,
+        32
+      ],
+      "id": "9f7c406f-26c7-4d1b-94b7-7908fffbe4c0",
+      "name": "Delete an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "lQgt6Q3HgXy5KkL9",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Responde unicamente cn la informaion de la herremienta http\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        864
+      ],
+      "id": "be68cd71-894a-452b-a80c-2f5e3089fe7d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        864
+      ],
+      "id": "c58f7156-e765-413e-a598-c77d056c91ab",
+      "name": "When chat message received",
+      "webhookId": "d82bcf04-c17d-4b65-b5d0-6178f1888fb3"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        1040
+      ],
+      "id": "a1d3d29b-2583-4767-8d43-e63f0e013ce9",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Dk07O50OnUtUN5R9",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        1040
+      ],
+      "id": "599ff4a2-734c-4ee2-9052-2c96edaad5fe",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "RAG local",
+        "method": "POST",
+        "url": "=http://127.0.0.1:8000/ask\n\n",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Name', ``, 'string') }}",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        1120
+      ],
+      "id": "a650d72c-92fd-46cc-98f3-f9cd77140360",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://pedroluzuriaga.app.n8n.cloud/mcp-test/78fd89e2-4f3c-4d97-a817-f655dc719552",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        1088
+      ],
+      "id": "603d313e-8eea-4cdb-ac98-4f627428b367",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.response}}",
+        "options": {
+          "systemMessage": "Eres un agente especializado en GESTIÓN DE REUNIONES.\nTu única función es verificar si el input contiene datos estructurados completos para crear o eliminar reuniones, y usar las herramientas disponibles cuando corresponda.\n\n--------------------------------\n📥 INPUT:\nEl input puede venir en cualquiera de los siguientes formatos:\n1. Texto libre (ejemplo: \"Hola\", \"quiero crear una reunión\")\n2. Texto que contiene JSON serializado (ejemplo: \"[{ \\\"response\\\": \\\"{...}\\\" }]\")\n3. JSON directamente con campos de reunión (ejemplo: { \"title\": \"...\", \"start\": \"...\", \"end\": \"...\", \"participants\": [...] })\n--------------------------------\n\nREGLA PRINCIPAL:\nDebes primero interpretar (parsear) el contenido del input:\n- Si el texto contiene un objeto JSON dentro del campo `\"response\"` o entre comillas, **extrae y analiza ese JSON** antes de decidir.\n- Si después de analizarlo detectas que el JSON tiene los datos completos para una reunión, **usa la tool correspondiente**.\n- Si no hay JSON válido o faltan campos, sigue las reglas de salida.\n\n--------------------------------\n🔎 VALIDACIÓN DE DATOS:\n\n📍 PARA CREAR (debes tener TODOS):\n{\n  \"title\": \"string\",\n  \"start\": \"fecha/hora\",\n  \"end\": \"fecha/hora\",\n  \"participants\": [\"correo1\", \"correo2\"]\n}\n\n📍 PARA ELIMINAR (debes tener TODOS):\n{\n  \"title\": \"string\",\n  \"participants\": [\"correo1\", \"correo2\"]\n}\n\n--------------------------------\n⚙️ COMPORTAMIENTO:\n\n✅ Si el input contiene un objeto con todos los campos para CREAR:\n- Ejecuta la tool `create_meeting` con esos valores.\n- Devuelve:  \n  `\"La reunión '[title]' fue creada exitosamente para los participantes [lista de correos].\"`\n\n✅ Si el input contiene un objeto con todos los campos para ELIMINAR:\n- Ejecuta la tool `delete_meeting` con esos valores.\n- Devuelve:  \n  `\"La reunión '[title]' fue eliminada exitosamente.\"`\n\n❌ Si hay campos faltantes:\n- Devuelve exactamente: `\"Faltan datos: [campos faltantes]\"`\n\n🔁 Si no hay JSON ni estructura reconocible de reunión:\n- Devuelve **exactamente el input original sin cambios**.\n\n--------------------------------\n📋 EJEMPLOS:\n\nInput: \"Hola\"  \n→ Output: \"Hola\"\n\nInput: \"Quiero agendar reunión\"  \n→ Output: \"Quiero agendar reunión\"\n\nInput: {\"title\": \"Reunión\"}  \n→ Output: \"Faltan datos: start, end, participants\"\n\nInput: {\"participants\": [\"a@b.com\"]}  \n→ Output: \"Faltan datos: title, start, end\"\n\nInput: {\n  \"title\": \"Reunión del equipo\",\n  \"start\": \"2025-12-10T10:00:00\",\n  \"end\": \"2025-12-10T12:00:00\",\n  \"participants\": [\"pedriniandres@gmail.com\"]\n}  \n→ Output: \"La reunión 'Reunión del equipo' fue creada exitosamente para los participantes pedriniandres@gmail.com.\"\n\n--------------------------------\n🚫 PROHIBIDO TOTALMENTE:\n- Modificar o reinterpretar texto que no tenga datos de reunión.\n- Agregar texto extra, saludos o explicaciones.\n- Inventar datos faltantes.\n- Confirmar, resumir o reformular inputs textuales.\n--------------------------------\n\nRESUMEN DE TU ROL:\nVerificador y ejecutor de reuniones.\n- Si el input no tiene estructura válida → lo devuelves tal cual.\n- Si tiene estructura parcial → señalas los campos faltantes.\n- Si tiene estructura completa → ejecutas la tool adecuada y devuelves el mensaje correspondiente.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        -32
+      ],
+      "id": "6e8d9ef4-9d0a-4202-be9b-64bbc1b3c169",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://pedroluzuriaga.app.n8n.cloud/mcp/78fd89e2-4f3c-4d97-a817-f655dc719552",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        192
+      ],
+      "id": "6a9cbdba-095a-4be9-81d7-c08c362267a9",
+      "name": "MCP Client1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        112
+      ],
+      "id": "92b2faef-0f88-42bd-bb73-39d84dc4316f",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Dk07O50OnUtUN5R9",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Edit Fields1": [
+      {
+        "json": {
+          "id": "1621514350",
+          "text": "¡Hola! ¿Cómo puedo ayudarte hoy?"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Embeddings Cohere": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Chain": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b45fae57-44b3-4fa7-b12b-1a27efb31daf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "118cb37ef65346761d96dbb5666f3c763b926008661d23c931815b85be68660b"
+  },
+  "id": "ubw8I8Zd1e6LQsUb",
+  "tags": []
+}
